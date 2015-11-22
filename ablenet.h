@@ -40,6 +40,8 @@ public:
     void send(uint64_t, std::string);
     void broadcast(std::string);
 
+    void remove_client(uint64_t);
+
 private:
     static std::mutex mutex_;
     static Server* instance_;

@@ -21,6 +21,7 @@ ablenet::Client::Client(uint64_t id, tcp::socket socket, Plugin::Instance* pins)
 ablenet::Client::~Client()
 {
     delete pins_;
+    Server::instance()->remove_client(id_);
 }
 
 void ablenet::Client::on_data(std::string data)
@@ -109,14 +110,29 @@ void ablenet::Server::start()
 
 void ablenet::Server::send(uint64_t id, std::string data)
 {
-    clients_[id].lock()->send(data);
+    if(!clients_[id].expired())
+    {
+        clients_[id].lock()->send(data);
+    }
 }
 
 void ablenet::Server::broadcast(std::string data)
 {
     for(auto const &item: clients_)
     {
-        item.second.lock()->send(data);
+        if(!item.second.expired())
+        {
+            item.second.lock()->send(data);
+        }
+    }
+}
+
+void ablenet::Server::remove_client(uint64_t id)
+{
+    auto iter = clients_.find(id);
+    if(iter != clients_.end())
+    {
+        clients_.erase(iter);
     }
 }
 

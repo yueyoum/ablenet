@@ -41,7 +41,6 @@ static PyMemberDef Process_members[] = {
 
 static PyObject* Process_send(Process* self, PyObject* args)
 {
-    printf("SEND...\n");
     char *data;
 
     if(!PyArg_ParseTuple(args, "s", &data))
@@ -54,8 +53,22 @@ static PyObject* Process_send(Process* self, PyObject* args)
     Py_RETURN_NONE;
 }
 
+static PyObject* Process_broadcast(Process* self, PyObject* args)
+{
+    char *data;
+
+    if(!PyArg_ParseTuple(args, "s", &data))
+    {
+        return NULL;
+    }
+
+    ablenet::Server::instance()->broadcast(std::string(data));
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef Process_methods[] = {
     {"send", (PyCFunction)Process_send, METH_VARARGS, ""},
+    {"broadcast", (PyCFunction)Process_broadcast, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 
 };
